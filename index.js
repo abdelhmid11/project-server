@@ -25,7 +25,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  origin: ['http://localhost:5173', 'https://your-frontend-domain.netlify.app'], // 👈 حط هنا دومين الواجهة الأمامية
   credentials: true
 }));
 app.use(express.json());
@@ -35,30 +35,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/resources', resourceRoutes);
 app.use('/api/contact', contactRoutes); // ✅ أضفنا هنا Route التواصل معنا
 
-// Health check
-app.get('/api/health', async (req, res) => {
-  try {
-    // استدعاء الموديلات لإحصاء عدد المستخدمين والموارد
-    const { default: User } = await import('./models/User.js');
-    const { default: Resource } = await import('./models/Resource.js');
-    const { default: Contact } = await import('./models/Contact.js');
-
-    const userCount = await User.countDocuments();
-    const resourceCount = await Resource.countDocuments();
-    const contactCount = await Contact.countDocuments();
-
-    res.json({
-      message: 'Server is running',
-      status: 'OK',
-      timestamp: new Date().toISOString(),
-      users: userCount,
-      resources: resourceCount,
-      contacts: contactCount
-    });
-  } catch (err) {
-    console.error('Health check error:', err);
-    res.status(500).json({ message: 'Error fetching health stats' });
-  }
+// ✅ Health check بسيط
+app.get('/api/health', (req, res) => {
+  res.json({
+    message: 'Server is running ✅',
+    status: 'OK',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Error handling middleware
