@@ -25,7 +25,11 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://your-frontend-domain.netlify.app'], // 👈 حط هنا دومين الواجهة الأمامية
+  origin: [
+    'http://localhost:5173',
+    'https://lustrious-gingersnap-3b0d0d.netlify.app', // 👈 دومين Netlify الخاص بك
+    'https://shafaq-luxury-04d73b.netlify.app'         // 👈 لو عندك نسخة تانية
+  ],
   credentials: true
 }));
 app.use(express.json());
