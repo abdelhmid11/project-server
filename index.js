@@ -13,33 +13,40 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // الاتصال بـ MongoDB Atlas
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
   .catch(err => {
     console.error("❌ MongoDB connection error:", err);
     process.exit(1); // خروج لو الاتصال فشل
   });
 
-// Middleware
+// ✅ CORS Middleware
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://lustrious-gingersnap-3b0d0d.netlify.app', // 👈 نسخة Netlify الأولى
+  'https://shafaq-luxury-04d73b.netlify.app',        // 👈 نسخة Netlify الثانية
+  'https://your-vercel-backend.vercel.app'           // 👈 لو رفعت على Vercel
+];
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://lustrious-gingersnap-3b0d0d.netlify.app', // 👈 دومين Netlify الخاص بك
-    'https://shafaq-luxury-04d73b.netlify.app'         // 👈 لو عندك نسخة تانية
-  ],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS Not Allowed for this origin: ' + origin));
+    }
+  },
   credentials: true
 }));
+
 app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/resources', resourceRoutes);
-app.use('/api/contact', contactRoutes); // ✅ أضفنا هنا Route التواصل معنا
+app.use('/api/contact', contactRoutes); // ✅ Route التواصل معنا
 
-// ✅ Health check بسيط
+// ✅ Health check
 app.get('/api/health', (req, res) => {
   res.json({
     message: 'Server is running ✅',
